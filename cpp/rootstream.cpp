@@ -1,4 +1,4 @@
-/**
+/*
  * Rootstream — from a single root to seed
  * C++ Reference Implementation v1.0
  *
@@ -17,11 +17,7 @@
 #include <cstdint>
 #include <cstring>
 
-// ─── Types ───────────────────────────────────────────────────────────────────
-
 using Bytes = std::vector<uint8_t>;
-
-// ─── Self-contained SHA-256 ──────────────────────────────────────────────────
 
 static const uint32_t K[64] = {
     0x428a2f98,0x71374491,0xb5c0fbcf,0xe9b5dba5,
@@ -50,14 +46,12 @@ Bytes sha256(const Bytes& msg) {
         0x510e527f,0x9b05688c,0x1f83d9ab,0x5be0cd19,
     };
 
-    // Pre-processing: padding
     Bytes m = msg;
     uint64_t bit_len = (uint64_t)msg.size() * 8;
     m.push_back(0x80);
     while (m.size() % 64 != 56) m.push_back(0x00);
     for (int i = 7; i >= 0; --i) m.push_back((bit_len >> (i * 8)) & 0xff);
 
-    // Process each 512-bit block
     for (size_t i = 0; i < m.size(); i += 64) {
         uint32_t w[64];
         for (int j = 0; j < 16; ++j)
@@ -93,10 +87,7 @@ Bytes sha256(const Bytes& msg) {
     return digest;
 }
 
-// ─── Default seed: η = 1/√2, IEEE 754 LE double, repeated 4x ────────────────
-
 Bytes default_seed() {
-    // 1/√2 as IEEE 754 little-endian double: cd 3b 7f 66 9e a0 e6 3f
     uint8_t eta_bytes[8] = {0xcd, 0x3b, 0x7f, 0x66, 0x9e, 0xa0, 0xe6, 0x3f};
     Bytes seed;
     for (int i = 0; i < 4; ++i)
@@ -104,8 +95,6 @@ Bytes default_seed() {
             seed.push_back(eta_bytes[j]);
     return seed;
 }
-
-// ─── Rootstream state ────────────────────────────────────────────────────────
 
 struct Rootstream {
     Bytes state;
@@ -116,13 +105,11 @@ struct Rootstream {
         counter = 0;
     }
 
-    // Collect 256 sifted bits
     std::vector<int> collect_bits() {
         std::vector<int> bits;
         bits.reserve(256);
 
         while (bits.size() < 256) {
-            // data = state || uint32_be(counter)
             Bytes data = state;
             data.push_back((counter >> 24) & 0xff);
             data.push_back((counter >> 16) & 0xff);
@@ -146,7 +133,6 @@ struct Rootstream {
         return bits;
     }
 
-    // XOR fold 256 bits -> 16 bytes, MSB first
     Bytes xor_fold(const std::vector<int>& bits) {
         Bytes out(16, 0);
         for (int i = 0; i < 128; ++i) {
@@ -156,14 +142,11 @@ struct Rootstream {
         return out;
     }
 
-    // Generate next 16-byte chunk
     Bytes next() {
         auto bits = collect_bits();
         return xor_fold(bits);
     }
 };
-
-// ─── Helpers ─────────────────────────────────────────────────────────────────
 
 std::string to_hex(const Bytes& b) {
     std::ostringstream ss;
@@ -171,8 +154,6 @@ std::string to_hex(const Bytes& b) {
         ss << std::hex << std::setw(2) << std::setfill('0') << (int)byte;
     return ss.str();
 }
-
-// ─── Test vectors ────────────────────────────────────────────────────────────
 
 const char* EXPECTED[] = {
     "11ddfd55397330138a570f9f9c024996",
@@ -208,8 +189,6 @@ void run_tests() {
     else
         std::cout << "✗ Vectors do not match. Implementation is non-compliant.\n";
 }
-
-// ─── Main ────────────────────────────────────────────────────────────────────
 
 int main() {
     run_tests();
