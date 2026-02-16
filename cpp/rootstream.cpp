@@ -89,11 +89,22 @@ Bytes sha256(const Bytes& msg) {
 
 Bytes seed_from(double value) {
     Bytes seed;
+    
+    // Convert double to uint64_t preserving bit pattern
+    uint64_t bits;
+    std::memcpy(&bits, &value, 8);
+    
+    // Extract bytes in little-endian order
     uint8_t bytes[8];
-    std::memcpy(bytes, &value, 8);
+    for (int i = 0; i < 8; ++i) {
+        bytes[i] = (bits >> (i * 8)) & 0xff;
+    }
+    
+    // Repeat 4 times to create 32-byte seed
     for (int i = 0; i < 4; ++i)
         for (int j = 0; j < 8; ++j)
             seed.push_back(bytes[j]);
+    
     return seed;
 }
 
