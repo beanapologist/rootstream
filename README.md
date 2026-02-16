@@ -27,18 +27,31 @@ One seed exchange. Zero ongoing bandwidth.
 ## Quick start
 
 **Python**
-```python
-from rootstream import stream
-
-gen = stream()
-print(next(gen).hex())  # 11ddfd55397330138a570f9f9c024996
+```bash
+python3 python/rootstream.py
 ```
 
 **C++**
 ```bash
-g++ -std=c++17 -O2 rootstream.cpp -o rootstream
-./rootstream
+g++ -std=c++17 -O2 cpp/rootstream.cpp -o rootstream && ./rootstream
 ```
+
+**JavaScript**
+```bash
+node js/rootstream.js
+```
+
+**Rust**
+```bash
+rustc rust/rootstream.rs -o rootstream && ./rootstream
+```
+
+**Go**
+```bash
+go run go/rootstream.go
+```
+
+All output the same 5 test vectors.
 
 ---
 
@@ -73,6 +86,7 @@ The sifting step and XOR fold are fully specified in [SPEC.md](SPEC.md) with no 
 ## Custom seeds
 
 ```python
+# python/rootstream.py
 from rootstream import stream, seed_from
 import math
 
@@ -90,13 +104,25 @@ gen = stream(seed_from(math.e))
 
 ---
 
-## Files
+## Repository structure
 
-| File | Purpose |
-|---|---|
-| `SPEC.md` | Protocol specification and test vectors |
-| `rootstream.py` | Python reference implementation |
-| `rootstream.cpp` | C++ reference implementation (no dependencies) |
+```
+rootstream/
+├── README.md          # This file
+├── SPEC.md            # Protocol specification and test vectors
+├── python/
+│   └── rootstream.py  # Python reference
+├── cpp/
+│   └── rootstream.cpp # C++ reference (no dependencies)
+├── js/
+│   └── rootstream.js  # JavaScript reference (Node/Deno/Bun/browser)
+├── rust/
+│   └── rootstream.rs  # Rust reference (no dependencies)
+└── go/
+    └── rootstream.go  # Go reference (stdlib only)
+```
+
+All implementations produce identical output for the same seed.
 
 ---
 
