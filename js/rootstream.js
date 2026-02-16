@@ -80,9 +80,18 @@ function sha256(data) {
   return digest;
 }
 
-const ETA_BYTES = new Uint8Array([0xcd, 0x3b, 0x7f, 0x66, 0x9e, 0xa0, 0xe6, 0x3f]);
-const DEFAULT_SEED = new Uint8Array(32);
-for (let i = 0; i < 4; i++) DEFAULT_SEED.set(ETA_BYTES, i * 8);
+function seedFrom(value) {
+  const buf = new ArrayBuffer(8);
+  const view = new DataView(buf);
+  view.setFloat64(0, value, true); // little-endian
+  const bytes = new Uint8Array(buf);
+  const seed = new Uint8Array(32);
+  for (let i = 0; i < 4; i++) seed.set(bytes, i * 8);
+  return seed;
+}
+
+const ETA = 0.7071067811865476; // η = 1/√2
+const DEFAULT_SEED = seedFrom(ETA);
 
 class Rootstream {
   constructor(seed = DEFAULT_SEED) {

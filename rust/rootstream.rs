@@ -77,14 +77,19 @@ fn sha256(data: &[u8]) -> [u8; 32] {
     digest
 }
 
-const ETA_BYTES: [u8; 8] = [0xcd, 0x3b, 0x7f, 0x66, 0x9e, 0xa0, 0xe6, 0x3f];
+const ETA: f64 = 0.7071067811865476; // η = 1/√2
 
-fn default_seed() -> [u8; 32] {
+fn seed_from(value: f64) -> [u8; 32] {
     let mut seed = [0u8; 32];
+    let bytes = value.to_le_bytes();
     for i in 0..4 {
-        seed[i*8..i*8+8].copy_from_slice(&ETA_BYTES);
+        seed[i*8..i*8+8].copy_from_slice(&bytes);
     }
     seed
+}
+
+fn default_seed() -> [u8; 32] {
+    seed_from(ETA)
 }
 
 struct Rootstream {
