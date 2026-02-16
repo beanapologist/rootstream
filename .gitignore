@@ -1,0 +1,10 @@
+# Compiled binaries
+cpp/rootstream
+cpp/rootstream_test
+rust/rootstream
+rust/rootstream_test
+go/rootstream
+
+# Python cache
+python/__pycache__/
+*.pyc
