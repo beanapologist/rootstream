@@ -14,17 +14,23 @@ import (
 	"encoding/binary"
 	"encoding/hex"
 	"fmt"
+	"math"
 )
 
-// η = 1/√2 as IEEE 754 little-endian double: cd 3b 7f 66 9e a0 e6 3f
-var etaBytes = [8]byte{0xcd, 0x3b, 0x7f, 0x66, 0x9e, 0xa0, 0xe6, 0x3f}
+const eta = 0.7071067811865476 // η = 1/√2
 
-func defaultSeed() [32]byte {
+func seedFrom(value float64) [32]byte {
 	var seed [32]byte
+	var buf [8]byte
+	binary.LittleEndian.PutUint64(buf[:], math.Float64bits(value))
 	for i := 0; i < 4; i++ {
-		copy(seed[i*8:], etaBytes[:])
+		copy(seed[i*8:], buf[:])
 	}
 	return seed
+}
+
+func defaultSeed() [32]byte {
+	return seedFrom(eta)
 }
 
 type Rootstream struct {

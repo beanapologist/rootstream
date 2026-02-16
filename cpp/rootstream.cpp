@@ -87,13 +87,29 @@ Bytes sha256(const Bytes& msg) {
     return digest;
 }
 
-Bytes default_seed() {
-    uint8_t eta_bytes[8] = {0xcd, 0x3b, 0x7f, 0x66, 0x9e, 0xa0, 0xe6, 0x3f};
+Bytes seed_from(double value) {
     Bytes seed;
+    
+    // Convert double to uint64_t preserving bit pattern
+    uint64_t bits;
+    std::memcpy(&bits, &value, 8);
+    
+    // Extract bytes in little-endian order
+    uint8_t bytes[8];
+    for (int i = 0; i < 8; ++i) {
+        bytes[i] = (bits >> (i * 8)) & 0xff;
+    }
+    
+    // Repeat 4 times to create 32-byte seed
     for (int i = 0; i < 4; ++i)
         for (int j = 0; j < 8; ++j)
-            seed.push_back(eta_bytes[j]);
+            seed.push_back(bytes[j]);
+    
     return seed;
+}
+
+Bytes default_seed() {
+    return seed_from(0.7071067811865476);  // η = 1/√2
 }
 
 struct Rootstream {
